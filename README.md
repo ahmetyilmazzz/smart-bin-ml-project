@@ -1,26 +1,22 @@
 # Smart Bin Projesi - Doluluk Tahmini ve Sınıflandırma
 
-Bu projede akıllı çöp konteynerlerinden gelen sensör verilerini kullanarak konteynerlerin boşaltılıp boşaltılmayacağını tahmin etmeye çalıştım.
+Bu projede, akıllı çöp kutularından gelen sensör verileriyle, bir çöp kutusunun boşaltılması gerekip gerekmediğini tahmin eden bir model yapmaya çalıştım.
 
 ---
 
 ## Sertifikalar
 
 ### Makine Öğrenmesi Sertifikası
-
 ![Makine Öğrenmesi Sertifika](images/makine_ogrenmesi_sertifika.png)
 
 ### Python Sertifikası
-
 ![Python Sertifika](images/python_sertifika.png)
-
----
 
 ---
 
 ## Proje Amacı
 
-Amacım akıllı atık yönetiminde verimliliği artırmak için konteynerlerin ne kadar dolduğuna bakmak ve boşaltma kararlarını optimize etmek.
+Bu projedeki amacım, çöp toplama işini daha verimli hale getirmek. Bunun için de akıllı çöp kutularının doluluk durumuna bakıp, en doğru zamanda boşaltılmasını sağlamaya çalıştım.
 
 Yapmak istediklerim:
 - Hangi konteyner tipi hangi atıkta daha hızlı doluyor bulmak
@@ -31,18 +27,16 @@ Yapmak istediklerim:
 
 ## Veri Seti
 
-Smart_Bin.csv dosyasını kullanıyorum. İçinde 4638 tane kayıt ve 10 tane sütun var.
+Kullandığım veri seti `Smart_Bin.csv` dosyası. İçinde 4638 tane kayıt ve 10 tane sütun var.
 
 ### Değişkenler ne anlama geliyor?
-
-- Class: Boşaltılıp boşatılmadığı (Emptying / Non-Emptying) - Tahmin etmeye çalıştığım şey
-- FL_B: Alt sensörden gelen doluluk oranı
-- FL_A: Üst sensörden gelen doluluk oranı
-- VS: Hacim sensörü verisi
-- FL_B_3, FL_A_3: 3 saat önceki doluluk verileri
-- FL_B_12, FL_A_12: 12 saat önceki doluluk verileri
-- Container Type: Çöp kutusunun tipi (Cubic, Diamond, Accordion gibi)
-- Recyclable fraction: Atık türü (Mixed, Recyclable, Non Recyclable)
+- Class: Kutunun boşaltılıp boşaltılmadığı (Hedef değişkenim bu).
+- FL_B, FL_A: Alttaki ve üstteki sensörlerin ölçtüğü doluluk.
+- VS: Hacim sensörü.
+- FL_B_3, FL_A_3: 3 saat önceki doluluklar.
+- FL_B_12, FL_A_12: 12 saat önceki doluluklar.
+- Container Type: Konteynerin tipi (Kübik, Elmas şeklinde vs.).
+- Recyclable fraction: İçindeki atığın türü (Karışık, Geri dönüştürülebilir vb.).
 
 ---
 
@@ -56,15 +50,12 @@ Neden pivot tablo yaptım?
 - Bu sayede en hızlı dolan çöp kutusu + atık türünü bulabiliyorum
 
 ### 1. FL_B (Alt Sensör) Ortalamaları
-
 ![FL_B Pivot](images/pivot_fl_b.png)
 
 ### 2. FL_A (Üst Sensör) Ortalamaları
-
 ![FL_A Pivot](images/pivot_fl_a.png)
 
 ### 3. Doluluk Artışı (FL_B - FL_A)
-
 ![Delta Pivot](images/pivot_delta.png)
 
 ---
@@ -88,7 +79,6 @@ EN HIZLI DOLAN KOMBINASYON: Fiberglass Igloo-b + Recyclable
 ## Kullanılan Modeller
 
 3 farklı model denedim:
-
 1. Random Forest
 2. Gradient Boosting
 3. Logistic Regression
@@ -96,55 +86,41 @@ EN HIZLI DOLAN KOMBINASYON: Fiberglass Igloo-b + Recyclable
 Her birini eğitip test ettim.
 
 ### Random Forest Sonuçları
-
 ![Random Forest Sonuç](images/random_forest_sonuclar.png)
 
 ### Gradient Boosting Sonuçları
-
 ![Gradient Boosting Sonuç](images/gradient_boosting_sonuclar.png)
 
 ### Logistic Regression Sonuçları
-
 ![Logistic Regression Sonuç](images/logistic_regression_sonuclar.png)
-
 
 ---
 
 ## Kod Çalışınca Oluşan Görseller
 
 ### Pivot Heatmap
-
-Kod çalıştırılınca otomatik olarak bu heatmap oluşturuluyor:
-
+Kod çalışınca, hangi çöp kutusu ve atık türünün ne kadar hızlı dolduğunu gösteren böyle bir ısı haritası (heatmap) çıkıyor. Koyu renkler daha hızlı dolanları gösteriyor.
 ![Pivot Heatmap](images/pivot_heatmap.png)
 
-Bu grafikte renk ne kadar koyuysa o kombinasyon o kadar hızlı doluyor demek.
-
 ### Confusion Matrix
-
-En iyi model için confusion matrix çiziliyor:
-
+En iyi çalışan modelin başarı durumunu gösteren bu grafik de otomatik çiziliyor. Hangi sınıfları doğru, hangilerini yanlış tahmin etmiş görebiliyoruz.
 ![Confusion Matrix](images/confusion_matrix.png)
-
-Bu grafik modelin hangi sınıfları ne kadar doğru tahmin ettiğini gösteriyor.
 
 ---
 
 ## smart_bin_classification.py Kod Açıklaması
 
-Önce csv dosyasını okudum, veri setinin boyutunu ve class dağılımına baktım.
-
-Sonra FL_B'den FL_A'yı çıkararak doluluk artışını hesapladım. Bu değeri kullanarak 3 tane pivot tablo oluşturdum - biri FL_B ortalamaları, biri FL_A ortalamaları, biri de doluluk artışı ortalamaları için. Kod en hızlı dolan kombinasyonu otomatik buldu, ben de bunu heatmap olarak çizip images klasörüne kaydettim.
-
-Veri ön işleme kısmında eksik olan Container Type değerlerini mod ile doldurdum. Kategorik verileri sayıya çevirmek için LabelEncoder kullandım çünkü modeller sayıları anlıyor. Container Type, Recyclable fraction ve Class sütunlarını sayıya çevirdim.
-
-Model kısmında 3 farklı model denedim: Random Forest, Gradient Boosting ve Logistic Regression. Her birini eğitip Accuracy, F1-Score ve Confusion Matrix değerlerine baktım. En iyi sonucu veren model için de confusion matrix grafiğini çizdim.
-
-
-Kod çalışınca pivot tablolarını ekrana yazacak, heatmap'i oluşturacak, confusion matrix'i çizecek ve en iyi modeli gösterecek.
+Kodun yaptığı işler kısaca şöyle:
+1.  `Smart_Bin.csv` dosyasını okuyor.
+2.  Dolma hızını hesaplamak için iki sensör verisi arasındaki farkı alıyor.
+3.  Bu hızlara göre pivot tablolar ve bir ısı haritası oluşturup `images` klasörüne kaydediyor.
+4.  Verideki eksik kısımları dolduruyor ve `LabelEncoder` ile yazıları sayılara çeviriyor (modellerin anlayacağı dile).
+5.  Veriyi eğitim ve test olarak ikiye ayırıyor.
+6.  Random Forest, Gradient Boosting ve Logistic Regression modellerini deneyip sonuçlarını (Accuracy, F1-Score) karşılaştırıyor.
+7.  En iyi modelin confusion matrix'ini çizip yine `images` klasörüne atıyor.
 
 ---
 
 ## Sonuç
 
-Bu projede Smart Bin veri seti üzerinde pivot tablo analizi yaptım ve sınıflandırma modelleri denedim. Random Forest en iyi sonucu verdi. Pivot tablo sayesinde hangi konteyner tipinin hangi atık türünde daha hızlı dolduğunu buldum.
+Sonuç olarak, bu projede hem veri analizi yaptım hem de makine öğrenmesi modelleri denedim. Yaptığım analizde, en hızlı dolan konteyner tipi ile atık türünü buldum. Denediğim modeller arasında da en iyi sonucu Random Forest verdi.
